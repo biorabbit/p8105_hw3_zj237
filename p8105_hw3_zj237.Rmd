@@ -8,10 +8,99 @@ output: github_document
 First of all, we should include the libraries we are using.
 ```{r init, message=FALSE}
 library(tidyverse)
+library(p8105.datasets)
 ```
 
 # Problem 1
 
 ```{r}
-
+data("instacart")
+aisle_group = 
+  instacart %>%
+  group_by(aisle) %>%
+  summarise(n_obs =  n()) %>%
+  arrange(-n_obs)
 ```
+
+
+
+Thus, there are `r length(aisle_group$aisle)` different aisles. The most popular aisle is `r aisle_group$aisle[1]`.
+Then, we make a plot of aisles with more than 10000 items ordered.
+
+```{r, message=FALSE}
+aisle_group %>%
+  mutate(aisle=fct_reorder(aisle,-n_obs)) %>%
+  filter(n_obs > 10000) %>%
+  ggplot(aes(x = n_obs,y = aisle,fill=n_obs)) +
+  geom_col(orientation="y") +
+  xlab("items_saled") +
+  viridis::scale_fill_viridis(trans = "log",
+                              name = "Items saled",
+                              breaks = c(25000,50000,100000)) 
+```
+The three most popular items in these isles are
+```{r, message=FALSE}
+instacart %>%
+  filter(aisle == "baking ingredients" |
+         aisle == "dog food care" |
+         aisle == "packaged vegetables fruits") %>%
+  group_by(aisle, product_name) %>%
+  summarise(
+    n_obs=n()
+  ) %>%
+  arrange(aisle,-n_obs) %>%
+  summarise(
+    popular_item = head(product_name,3),
+    n = head(n_obs,3),
+    rank = head(rank(-n_obs),3)
+  )
+```
+
+
+```{r, message=FALSE}
+instacart %>%
+  filter(product_name == "Pink Lady Apples" |
+         product_name == "Coffee Ice Cream"
+         ) %>%
+  group_by(product_name,order_dow) %>%
+  summarise(
+    mean_hour = mean(order_hour_of_day)
+  ) %>%
+  pivot_wider(names_from = "order_dow",
+              values_from = "mean_hour",
+              names_prefix = "day ")
+  
+  
+  
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

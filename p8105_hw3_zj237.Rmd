@@ -1,0 +1,17 @@
+---
+title: "p8105_hw3_zj2357"
+author: "Zekai Jin (zj2357)"
+date: "2022-10-10"
+output: github_document
+---
+
+First of all, we should include the libraries we are using.
+```{r init, message=FALSE}
+library(tidyverse)
+```
+
+# Problem 1
+
+```{r}
+
+```

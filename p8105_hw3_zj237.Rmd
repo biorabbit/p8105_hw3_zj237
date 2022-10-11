@@ -9,6 +9,7 @@ First of all, we should include the libraries we are using.
 ```{r init, message=FALSE}
 library(tidyverse)
 library(p8105.datasets)
+library(lubridate)
 ```
 
 # Problem 1
@@ -41,9 +42,11 @@ aisle_group %>%
 The three most popular items in these isles are
 ```{r, message=FALSE}
 instacart %>%
-  filter(aisle == "baking ingredients" |
-         aisle == "dog food care" |
-         aisle == "packaged vegetables fruits") %>%
+  filter(aisle %in% c("baking ingredients",
+                      "dog food care",
+                      "packaged vegetables fruits"
+                      )
+         ) %>%
   group_by(aisle, product_name) %>%
   summarise(
     n_obs=n()
@@ -78,16 +81,71 @@ instacart %>%
 
 
 
+# Problem 2
+```{r}
+rm(list = ls())
+accel_df = read_csv("data/accel_data.csv") %>%
+  pivot_longer(
+    activity.1:activity.1440,
+    names_to = "minute",
+    names_prefix = "activity.",
+    values_to = "activity"
+  ) %>%
+  mutate(
+    minute = as.integer(minute),
+    weekends = day %in% c("Saturday","Sunday")
+  )
+  
+accel_df
+
+```
+
+
+```{r}
+accel_df %>%
+  group_by(day_id) %>%
+  summarise(total_activity = sum(activity))
+```
 
 
 
 
+```{r}
+accel_df %>%
+  mutate(day_id = as.factor(day_id),
+         week = as.factor(week),
+         day = factor(day,levels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")),
+         hour = minute/60) %>%
+  group_by(day_id) %>%
+  ggplot(aes(x = hour, y = activity, group = day_id, color = day)) +
+  geom_smooth(se = FALSE,method = "loess" ) +
+  scale_x_continuous(breaks=0:12*2)
+
+
+```
+  
 
 
 
+```{r}
+rm(list = ls())
+data("ny_noaa")
+ny_noaa = ny_noaa %>%
+  mutate(
+    year = year(date),
+    month = month(date),
+    day = day(date),
+    tmax = as.integer(tmax),
+    tmin = as.integer(tmin)
+    ) %>%
+  select(id,date,year,month,day,everything())
 
-
-
+ny_noaa %>%
+  group_by(snow) %>%
+  summarise(n_obs = n()) %>%
+  arrange(-n_obs) %>%
+  head(3)
+```
 
 
 

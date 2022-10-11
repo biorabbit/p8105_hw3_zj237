@@ -10,6 +10,8 @@ First of all, we should include the libraries we are using.
 library(tidyverse)
 library(p8105.datasets)
 library(lubridate)
+library(patchwork)
+library(forcats)
 ```
 
 # Problem 1
@@ -133,12 +135,13 @@ data("ny_noaa")
 ny_noaa = ny_noaa %>%
   mutate(
     year = year(date),
-    month = month(date),
+    month = factor(month.name[month(date,label=TRUE)],levels=month.name),
     day = day(date),
     tmax = as.integer(tmax),
     tmin = as.integer(tmin)
     ) %>%
-  select(id,date,year,month,day,everything())
+  select(id,date,year,month,day,everything()) %>%
+  arrange(date)
 
 ny_noaa %>%
   group_by(snow) %>%
@@ -148,8 +151,28 @@ ny_noaa %>%
 ```
 
 
+```{r}
+ny_noaa %>%
+  subset(month %in% c("January","July")) %>%
+  group_by(year,month) %>%
+  summarise(
+    ave_tmax = mean(tmax,na.rm=TRUE),
+  ) %>%
+  ggplot() +
+  geom_line(aes(x=year,y=ave_tmax,color = month)) +
+  facet_grid(~month)
 
 
+```
+
+
+```{r}
+ny_noaa %>%
+  tail(5000) %>%
+  ggplot(aes(x=date, y = tmax))+geom_smooth(span=0.1,se=FALSE)
+  
+  
+```
 
 
 

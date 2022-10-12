@@ -5,7 +5,7 @@ date: "2022-10-10"
 output: github_document
 ---
 
-First of all, we should include the libraries we are using.
+First of all, we should include the libraries we are using.\
 ```{r init, message=FALSE}
 library(tidyverse)
 library(lubridate)
@@ -16,15 +16,15 @@ knitr::opts_chunk$set(message  = FALSE,
                       warning = FALSE)
 ```
 
-# Problem 1
+# Problem 1\
 ```{r}
 data("instacart")
 head(instacart,5)
 ```
-This dataset consists of `r nrow(instacart)` records, each redord represent an item purchased by a user within an order. `order_id` shows that there are `r nrow(distinct(instacart, order_id))` different orders. the other variables shows the time of the order, the name of the item and their catagories. 
+This dataset consists of `r nrow(instacart)` records, each record represent an item purchased by a user within an order. `order_id` shows that there are `r nrow(distinct(instacart, order_id))` different orders. the other variables shows the time of the order, the name of the item and their categories. \
 
 
-To analyze the aisles, use the following code
+To analyze the aisles, use the following code\
 
 ```{r}
 
@@ -36,8 +36,8 @@ aisle_group =
 ```
 
 
-Thus, there are `r nrow(aisle_group)` different aisles. The most popular aisle is `r aisle_group$aisle[1]`.
-Then, we make a plot of aisles with more than 10000 items ordered.
+Thus, there are `r nrow(aisle_group)` different aisles. The most popular aisle is `r aisle_group$aisle[1]`.\
+Then, we make a plot of aisles with more than 10000 items ordered.\
 
 ```{r}
 aisle_group %>%
@@ -51,8 +51,8 @@ aisle_group %>%
                               breaks = c(25000,50000,100000)) +
   labs(title = "Popular items with 10000 more sales")
 ```
-One concern for this analysis is that there would be more than 1 of each items within an order. However, the amount of items within an order is not given.
-To make a table showing the three most popular items in these isles, we have
+One concern for this analysis is that there would be more than 1 of each items within an order. However, the amount of items within an order is not given.\
+To make a table showing the three most popular items in these isles, we have\
 ```{r, message=FALSE}
 instacart %>%
   filter(aisle %in% c("baking ingredients",
@@ -70,7 +70,7 @@ instacart %>%
   )
 ```
 
-And to make a table showing the mean hour of the day, use the folliwing code: 
+And to make a table showing the mean hour of the day, use the following code:\ 
 ```{r, message=FALSE}
 instacart %>%
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
@@ -89,8 +89,8 @@ instacart %>%
 ```
 
 
-# Problem 2
-First, we should tidy the dataset:
+# Problem 2\
+First, we should tidy the dataset:\
 ```{r}
 rm(list = ls())
 accel_df = read_csv("data/accel_data.csv") %>%
@@ -109,8 +109,8 @@ accel_df = read_csv("data/accel_data.csv") %>%
   
 head(accel_df,5)
 ```
-Thus, the reasulting dataframe `accel_df` consists of $5*7*24*60=50400$ records. Each record contains activity of the male during a minute's period of time, stored in variable `activity`. Other varibles in the record shows information for the one-minute time period. 
-The following code creates a tgable for the total activity for each day, and made a plot.
+Thus, the resulting dataframe `accel_df` consists of $5\times7\times24\times60=50400$ records. Each record contains activity of the male during a minute's period of time, stored in variable `activity`. Other variables in the record shows information for the one-minute time period. \
+The following code creates a table for the total activity for each day, and made a plot.\
 
 ```{r}
 accel_df %>%
@@ -124,8 +124,8 @@ accel_df %>%
   geom_point() +
   labs(title = "Total activity every day")
 ```
-Thus, no apparant trends can be seen under this analysis, except for some days having almost zero activity.
-However, it is notable that the `day_id` does not represent days after study begins. To solve this problem, use the following code
+Thus, no apparant trends can be seen under this analysis, except for some days having almost zero activity.\
+However, it is notable that the `day_id` does not represent days after study begins. To solve this problem, use the following code\
 ```{r}
 accel_df %>%
   group_by(week,day) %>%
@@ -141,11 +141,11 @@ accel_df %>%
   labs(title = "Total activity every day")
 
 ```
-From the figure, the activity is more stable from Tuesday to Friday, and have more variance on Sunday and Mondays. The activity on Saturday is not reliable due to missing data for two days.
-However, it is likely that missing data is encoded as 1, thus the `total_activity` here should be lower than the true value. This could be solved by encoding 1 as `NA` and analyze based on `mean(activity)`.
+From the figure, the activity is more stable from Tuesday to Friday, and have more variance on Sunday and Mondays. The activity on Saturday is not reliable due to missing data for two days.\
+However, it is likely that missing data is encoded as 1, thus the `total_activity` here should be lower than the true value. This could be solved by encoding 1 as `NA` and analyze based on `mean(activity)`.\
 
 
-to make a single-panel plot that shows the 24-hour activity time courses for each day, use the following code: 
+to make a single-panel plot that shows the 24-hour activity time courses for each day, use the following code: \
 ```{r}
 accel_df %>%
   mutate(day_id = as.factor(day_id),
@@ -157,11 +157,12 @@ accel_df %>%
   scale_x_continuous(breaks = 0:12 * 2) +
   labs(title = "Activity course every day")
 ```
- This plot shows that the males tends to exercise in the morning between 5-11 a.m. and in the evening between 18-22 p.m. He seldom move during midnight, and reduced activity at noon.
- Meanwhile, his exercise on each day across week showed similar pattern. For example, in 4 out of 5 weeks, the man exercised in the evening on Friday (purple lines). 
+ This plot shows that the males tends to exercise in the morning between 5-11 a.m. and in the evening between 18-22 p.m. He seldom move during midnight, and reduced activity at noon.\
+ Meanwhile, his exercise on each day across week showed similar pattern. For example, in 4 out of 5 weeks, the man exercised in the evening on Friday (purple lines). \
+ Notably, there are negative values in the smoothed lines. However, it does not mean that activity can take negative values.\
 
 # Problem 3
-First of all, clean the data using the following code:
+First of all, clean the data using the following code:\
 ```{r}
 rm(list = ls())
 data("ny_noaa")
@@ -178,9 +179,9 @@ ny_noaa = ny_noaa %>%
   select(id, date, year, month, day, everything()) %>%
   arrange(date)
 ```
-The dataframe consists of `r nrow(ny_noaa)` records from `r nrow(distinct(ny_noaa,id))` weather stations, lasting from ``r ny_noaa$date[1]` to `r tail(ny_noaa$date, 1)`. For each record, there are information for the Precipitation, Snowfall, Snow depth(mm) and Maximum/minimum Temperature$(^oC)$ information.
+The dataframe consists of `r nrow(ny_noaa)` records from `r nrow(distinct(ny_noaa,id))` weather stations, lasting from ``r ny_noaa$date[1]` to `r tail(ny_noaa$date, 1)`. For each record, there are information for the Precipitation, Snowfall, Snow depth(mm) and Maximum/minimum Temperature$(^oC)$ information.\
 
-We can count the frequency based on the following code:
+We can count the frequency based on the following code:\
 ```{r}
 ny_noaa %>%
   group_by(snow) %>%
@@ -188,9 +189,9 @@ ny_noaa %>%
   arrange(-n_obs) %>%
   head(3)
 ```
-Because most days don't snow, the most frequent value is 0, indicating no snows.
+Because most days don't snow, the most frequent value is 0, indicating no snows.\
 
-The code below makes a two-panel plot showing the average max temperature in January and in July. Each line represents a record from a  different station.
+The code below makes a two-panel plot showing the average max temperature in January and in July. Each line represents a record from a  different station.\
 ```{r}
 ny_noaa %>%
   subset(month %in% c("January", "July")) %>%
@@ -204,10 +205,10 @@ ny_noaa %>%
   theme(legend.position = "none") +
   labs(title = "Average maximum temperature in January and July")
 ```
-From the figure, it is obvious that the average maximum temperature in July is always higher than in January, regardless of station and year. Meanwhile, the average maximum temperature from different stations tend to increase or drop together. During cold months, the record of all stations decreases to a similar extent, forming parallel lines in the figure. However, there are some notable outliers not following this pattern, such as the dip in July, 1988.
+From the figure, it is obvious that the average maximum temperature in July is always higher than in January, regardless of station and year. Meanwhile, the average maximum temperature from different stations tend to increase or drop together. During cold months, the record of all stations decreases to a similar extent, forming parallel lines in the figure. However, there are some notable outliers not following this pattern, such as the dip in July, 1988.\
 
 
-The code to make the two panel plot and the result is shown below. Considering the computational efficiency and differences across stations, take the average temperature between stations will have a better plot.   
+The code to make the two panel plot and the result is shown below. Considering the computational efficiency and differences across stations, take the average temperature between stations will have a better plot. \  
 ```{r}
 ny_noaa %>%
   mutate(day_of_year = yday(date),
@@ -221,24 +222,23 @@ ny_noaa %>%
                names_prefix = "ave_") %>%
   ggplot(aes(x = day_of_year, y = tempreture , group = year, color = t_type)) +
   geom_line(alpha = 0.3) +
-  facet_grid(~t_type)
-  
+  facet_grid(~t_type) +
+  labs(title = "Temperature extremes during the year")
 ```
 
 
 ```{r}
-
 ny_noaa %>%
   filter(snow > 0 & snow < 100) %>%
   mutate(year = as.factor(year)) %>%
   ggplot(aes(x = snow, y = year, fill = year)) +
   geom_density_ridges(scale = 1.5, alpha = 0.5, color = "#0000005F") +
-  scale_x_continuous(limit = c(0, 100))
-
-
+  scale_x_continuous(limit = c(0, 100)) +
+  labs(
+    title = "snowfall distribution across years",
+    x = "snowfall (mm)"
+  )
 ```
-
-
 
 
 

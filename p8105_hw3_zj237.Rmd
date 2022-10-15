@@ -12,8 +12,14 @@ library(lubridate)
 library(forcats)
 library(ggridges)
 library(p8105.datasets)
-knitr::opts_chunk$set(message  = FALSE,
-                      warning = FALSE)
+library(patchwork)
+knitr::opts_chunk$set(
+  message  = FALSE,
+  warning = FALSE,
+  fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
 ```
 
 # Problem 1\
@@ -37,6 +43,7 @@ aisle_group =
 
 
 Thus, there are `r nrow(aisle_group)` different aisles. The most popular aisle is `r aisle_group$aisle[1]`.\
+
 Then, we make a plot of aisles with more than 10000 items ordered.\
 
 ```{r}
@@ -51,8 +58,11 @@ aisle_group %>%
                               breaks = c(25000,50000,100000)) +
   labs(title = "Popular items with 10000 more sales")
 ```
+
 One concern for this analysis is that there would be more than 1 of each items within an order. However, the amount of items within an order is not given.\
+
 To make a table showing the three most popular items in these isles, we have\
+
 ```{r, message=FALSE}
 instacart %>%
   filter(aisle %in% c("baking ingredients",
@@ -71,6 +81,7 @@ instacart %>%
 ```
 
 And to make a table showing the mean hour of the day, use the following code:\ 
+
 ```{r, message=FALSE}
 instacart %>%
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>%
@@ -109,7 +120,9 @@ accel_df = read_csv("data/accel_data.csv") %>%
   
 head(accel_df,5)
 ```
+
 Thus, the resulting dataframe `accel_df` consists of $5\times7\times24\times60=50400$ records. Each record contains activity of the male during a minute's period of time, stored in variable `activity`. Other variables in the record shows information for the one-minute time period. \
+
 The following code creates a table for the total activity for each day, and made a plot.\
 
 ```{r}
@@ -124,8 +137,11 @@ accel_df %>%
   geom_point() +
   labs(title = "Total activity every day")
 ```
+
 Thus, no apparant trends can be seen under this analysis, except for some days having almost zero activity.\
+
 However, it is notable that the `day_id` does not represent days after study begins. To solve this problem, use the following code\
+
 ```{r}
 accel_df %>%
   group_by(week,day) %>%
@@ -141,7 +157,9 @@ accel_df %>%
   labs(title = "Total activity every day")
 
 ```
+
 From the figure, the activity is more stable from Tuesday to Friday, and have more variance on Sunday and Mondays. The activity on Saturday is not reliable due to missing data for two days.\
+
 However, it is likely that missing data is encoded as 1, thus the `total_activity` here should be lower than the true value. This could be solved by encoding 1 as `NA` and analyze based on `mean(activity)`.\
 
 
@@ -157,8 +175,11 @@ accel_df %>%
   scale_x_continuous(breaks = 0:12 * 2) +
   labs(title = "Activity course every day")
 ```
- This plot shows that the males tends to exercise in the morning between 5-11 a.m. and in the evening between 18-22 p.m. He seldom move during midnight, and reduced activity at noon.\
+
+This plot shows that the males tends to exercise in the morning between 5-11 a.m. and in the evening between 18-22 p.m. He seldom move during midnight, and reduced activity at noon.\
+
  Meanwhile, his exercise on each day across week showed similar pattern. For example, in 4 out of 5 weeks, the man exercised in the evening on Friday (purple lines). \
+ 
  Notably, there are negative values in the smoothed lines. However, it does not mean that activity can take negative values.\
 
 # Problem 3
@@ -179,9 +200,11 @@ ny_noaa = ny_noaa %>%
   select(id, date, year, month, day, everything()) %>%
   arrange(date)
 ```
+
 The dataframe consists of `r nrow(ny_noaa)` records from `r nrow(distinct(ny_noaa,id))` weather stations, lasting from ``r ny_noaa$date[1]` to `r tail(ny_noaa$date, 1)`. For each record, there are information for the Precipitation, Snowfall, Snow depth(mm) and Maximum/minimum Temperature$(^oC)$ information.\
 
 We can count the frequency based on the following code:\
+
 ```{r}
 ny_noaa %>%
   group_by(snow) %>%
@@ -189,7 +212,41 @@ ny_noaa %>%
   arrange(-n_obs) %>%
   head(3)
 ```
+
 Because most days don't snow, the most frequent value is 0, indicating no snows.\
+
+We also noticed that the second most frequent value is `NA`, indicating a large poportion of data is missing. To find our the distribution of missing values, 
+
+```{r}
+ny_noaa %>%
+  group_by(year) %>%
+  summarise(
+    prcp = mean(is.na(prcp)),
+    snow = mean(is.na(snow)),
+    snwd = mean(is.na(snwd)),
+    tmax = mean(is.na(tmax)),
+    tmin = mean(is.na(tmin))
+  ) %>%
+  pivot_longer(
+    prcp:tmin,
+    names_to = "variable",
+    values_to = "missing_percent"
+  ) %>%
+  ggplot(aes(x = year, y = missing_percent, color = variable)) +
+  geom_line(alpha = 0.5) +
+  labs(title = "Missing percentage across years")
+```
+
+Such increase in missing percentage is probably caused by increase of records from more weather stations.
+
+```{r}
+ny_noaa %>%
+  group_by(date) %>%
+  summarise(n_records = n()) %>%
+  ggplot(aes(x = date, y = n_records)) +
+  geom_line() +
+  labs(title = "Records per day")
+```
 
 The code below makes a two-panel plot showing the average max temperature in January and in July. Each line represents a record from a  different station.\
 ```{r}
@@ -205,30 +262,30 @@ ny_noaa %>%
   theme(legend.position = "none") +
   labs(title = "Average maximum temperature in January and July")
 ```
+
 From the figure, it is obvious that the average maximum temperature in July is always higher than in January, regardless of station and year. Meanwhile, the average maximum temperature from different stations tend to increase or drop together. During cold months, the record of all stations decreases to a similar extent, forming parallel lines in the figure. However, there are some notable outliers not following this pattern, such as the dip in July, 1988.\
 
-
-The code to make the two panel plot and the result is shown below. Considering the computational efficiency and differences across stations, take the average temperature between stations will have a better plot. \  
-```{r}
-ny_noaa %>%
+The code to make the two panel plot and the result is shown below.. \  
+```{r, cache=TRUE}
+temp_fig = 
+  ny_noaa %>%
   mutate(day_of_year = yday(date),
          year = as.factor(year)) %>%
-  group_by(year, day_of_year) %>%
-  summarise(ave_tmax = mean(tmax, na.rm = TRUE),
-            ave_tmin = mean(tmin, na.rm = TRUE)) %>%
-  pivot_longer(ave_tmax:ave_tmin,
+  pivot_longer(tmax:tmin,
                names_to = "t_type",
-               values_to = "tempreture",
-               names_prefix = "ave_") %>%
+               values_to = "tempreture") %>%
   ggplot(aes(x = day_of_year, y = tempreture , group = year, color = t_type)) +
-  geom_line(alpha = 0.3) +
-  facet_grid(~t_type) +
+  geom_line(alpha = 0.1) +
   labs(title = "Temperature extremes during the year")
+temp_fig + facet_grid(~t_type)
 ```
+Note that there are some abnormal values in the dataset, which should be corrected.
 
 
+This code chunk makes a density plot for the distribution of snowfalls across years.
 ```{r}
-ny_noaa %>%
+snowfall_fig = 
+  ny_noaa %>%
   filter(snow > 0 & snow < 100) %>%
   mutate(year = as.factor(year)) %>%
   ggplot(aes(x = snow, y = year, fill = year)) +
@@ -238,6 +295,15 @@ ny_noaa %>%
     title = "snowfall distribution across years",
     x = "snowfall (mm)"
   )
+snowfall_fig
+```
+
+To combine the two plots together, use the package `patchwork`.
+
+```{r, cache=TRUE, fig.height = 12}
+temp_fig/snowfall_fig +
+  plot_layout(heights = c(2, 3))
+
 ```
 
 
